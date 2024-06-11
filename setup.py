@@ -34,6 +34,7 @@ setup(
             'voice_control = src.voice_control:main',
             'up_front_servo_server = src.up_front_servo_server:main',
             'up_front_servo_client = src.up_front_servo_client:main',
+            'speed_test = src.speed_test:main',
             
         ],
     },
