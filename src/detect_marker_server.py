@@ -3,61 +3,56 @@ import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionServer
 from rclpy.action.server import ServerGoalHandle
-from units_interfaces.action import UpFrontServo
+from units_interfaces.action import DetectMarker
 import time
 
-from board import SCL, SDA
-import busio
-
-from adafruit_motor import servo
-from adafruit_pca9685 import PCA9685
 
 
-class UpFrontServoServer(Node): 
+class DetectMarkerServer(Node): 
     def __init__(self): 
-        super().__init__("up_front_servo_server")
+        super().__init__("detect_marker_server")
 
-        i2c = busio.I2C(SCL, SDA)
-        # Create a simple PCA9685 class instance.
-        pca = PCA9685(i2c)
-        pca.frequency = 50
-
-        self.front_servo = servo.Servo(pca.channels[1], min_pulse=500, max_pulse=2600)
-        self.front_servo.fraction = 0.6
-
-        self.up_front_servo_server_  = ActionServer(
+        self.detect_marker_server = ActionServer(
             self,
-            UpFrontServo, 
-            "up_front_servo",
+            DetectMarker, 
+            "detect_marker",
             execute_callback=self.execute_callback)
-        self.get_logger().info("Action server has been started")
+        self.get_logger().info("Detect marker server has been started")
+
+    def run_speech(self, id_marker):
+        
+        self.get_logger().info(f'Hello, Liba_bot has been detected marker with number: {id_marker}')
+        # Put here script of speech
+        
 
     def execute_callback(self, goal_handle: ServerGoalHandle):
         # Get request from goal
+        id_marker = goal_handle.request.id_marker
         target_number = goal_handle.request.target_number
         period = goal_handle.request.period
 
+
         # Execute the action
-        self.get_logger().info("Executing up front servo")
-        self.front_servo.fraction = 0.08
+        
+        self.run_speech(id_marker)
         counter = 0 
         for i in range(target_number):
             counter += 1
             time.sleep(period)
             self.get_logger().info(str(counter))
-        self.front_servo.fraction = 0.6
+        
 
         # Once done, set goal final state
         goal_handle.succeed()
 
         # and send the result
-        result =  UpFrontServo.Result()
+        result =  DetectMarker.Result()
         result.reached_number = counter
         return result
 
 def main(args=None):
     rclpy.init(args=args)
-    node = UpFrontServoServer() 
+    node = DetectMarkerServer() 
     rclpy.spin(node)
     rclpy.shutdown
 
