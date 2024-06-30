@@ -264,7 +264,7 @@ class MobileBaseUnit(Node):
         self.speed_service_deadline = 0
         self.speed_service_on = False
         self.goto_service_on = False
-        self.safety_on = True
+        self.safety_on = False
 
        
 

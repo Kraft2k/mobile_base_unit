@@ -31,13 +31,14 @@ setup(
             'detect_reach_marker = src.detect_reach_marker:main',
             'detect_marker_client = src.detect_marker_client:main',
             'detect_marker_server = src.detect_marker_server:main',
+            'find_markers_client = src.find_markers_client:main',
+            'find_markers_server = src.find_markers_server:main',
             'follow_me = src.follow_me:main',
             'follow_wall = src.follow_wall:main',
             'follow_aruco_marker = src.follow_aruco_marker:main',
             'voice_control = src.voice_control:main',
             'up_front_servo_server = src.up_front_servo_server:main',
             'up_front_servo_client = src.up_front_servo_client:main',
-            
             'speed_test = src.speed_test:main',
             
         ],
