@@ -40,6 +40,14 @@ class DetectMarkerClient(Node):
         self.cmd_pub = self.create_publisher(
             Twist, 'cmd_vel', 10)
 
+        self.subscription_markers = self.create_subscription(
+            String,
+            'command_publish',
+            self.command_callback,
+            10)
+
+
+
         self.detect_marker_client_ = ActionClient(self, DetectMarker, "detect_marker")
 
         # self.max_distance = 0.7
@@ -109,7 +117,7 @@ class DetectMarkerClient(Node):
     
 
     def main_tick(self, verbose=False):
-        
+    
 
         if self.aruco_pose is not None:
             print(str(self.aruco_pose.marker_ids[0]))
@@ -132,15 +140,18 @@ class DetectMarkerClient(Node):
         else:
             current_time = time.time()
             print("self.aruco_pose is None")
-            lin_speed = 0.0
-            if (current_time - self.t0 <= self.rotation_span):
-                rot_speed = -self.rot_max_speed
-            elif (current_time - self.t0 <= self.rotation_span + self.waiting_span):
-                rot_speed = 0.0
-            else:
-                self.t0 = time.time()
-                rot_speed = 0.0
-            lin_speed = 0.0
+            
+            lin_speed = self.lin_max_speed
+            rot_speed = -self.rot_max_speed
+            # lin_speed = 0.0
+            # if (current_time - self.t0 <= self.rotation_span):
+            #     rot_speed = -self.rot_max_speed
+            # elif (current_time - self.t0 <= self.rotation_span + self.waiting_span):
+            #     rot_speed = 0.0
+            # else:
+            #     self.t0 = time.time()
+            #     rot_speed = 0.0
+            # lin_speed = 0.0
     
               
   

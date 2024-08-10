@@ -8,20 +8,20 @@ import time
 
 
 
-class DetectMarkerServer(Node): 
+class FindMarkersServer(Node): 
     def __init__(self): 
-        super().__init__("detect_marker_server")
+        super().__init__("find_markers_server")
 
         self.detect_marker_server = ActionServer(
             self,
             DetectMarker, 
             "detect_marker",
             execute_callback=self.execute_callback)
-        self.get_logger().info("Detect marker server has been started")
+        self.get_logger().info("Find markers server has been started")
 
-    def run_speech(self, id_marker):
+    def run_action(self, id_marker):
         
-        self.get_logger().info(f'Hello, Liba_bot has been detected marker with number: {id_marker}')
+        self.get_logger().info(f'The bot has been detected marker with number: {id_marker}')
         # Put here script of speech
         
 
@@ -34,7 +34,7 @@ class DetectMarkerServer(Node):
 
         # Execute the action
         
-        self.run_speech(id_marker)
+        self.run_action(id_marker)
         for i in range(target_number):
             time.sleep(period)
             self.get_logger().info(str(i))
@@ -46,12 +46,12 @@ class DetectMarkerServer(Node):
         # and send the result
         result =  DetectMarker.Result()
         result.reached_number = target_number
-        print(f' -> {id_marker}')
+        self.get_logger().info(f'Completion of action -> {id_marker}')
         return result
 
 def main(args=None):
     rclpy.init(args=args)
-    node = DetectMarkerServer() 
+    node = FindMarkersServer() 
     rclpy.spin(node)
     rclpy.shutdown
 

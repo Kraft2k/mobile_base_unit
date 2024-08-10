@@ -33,6 +33,8 @@ setup(
             'detect_marker_server = src.detect_marker_server:main',
             'find_markers_client = src.find_markers_client:main',
             'find_markers_server = src.find_markers_server:main',
+            'find_markers_client_observe = src.find_markers_client_observe:main',
+            'find_markers_server_observe = src.find_markers_server_observe:main',
             'follow_me = src.follow_me:main',
             'follow_wall = src.follow_wall:main',
             'follow_aruco_marker = src.follow_aruco_marker:main',
@@ -40,6 +42,8 @@ setup(
             'up_front_servo_server = src.up_front_servo_server:main',
             'up_front_servo_client = src.up_front_servo_client:main',
             'speed_test = src.speed_test:main',
+            'go = src.go:main',
+            
             
         ],
     },

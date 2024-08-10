@@ -98,6 +98,10 @@ class VoiceCommandControl(Node):
         elif (self.command.data == 'стоп'):
             lin_speed = 0.0
             rot_speed = 0.0
+
+        elif self.command.data in ['борис', 'эй борис']: 
+            lin_speed = 0.0
+            rot_speed = self.rot_max_speed
         
         else:
             lin_speed = 0.0

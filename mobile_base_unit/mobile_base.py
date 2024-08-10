@@ -181,7 +181,7 @@ class MobileBaseUnit(Node):
                 ('xy_tol', 0.0),
                 ('theta_tol', 0.0),
                 ('smoothing_factor', 5.0),
-                ('safety_distance', 0.75),
+                ('safety_distance', 0.85),
                 ('critical_distance', 0.55),
             ])
         self.add_on_set_parameters_callback(self.parameters_callback)
@@ -264,7 +264,7 @@ class MobileBaseUnit(Node):
         self.speed_service_deadline = 0
         self.speed_service_on = False
         self.goto_service_on = False
-        self.safety_on = False
+        self.safety_on = True
 
        
 

@@ -104,14 +104,15 @@ class FollowArucoMarker(Node):
             current_time = time.time()
             print("self.aruco_pose is None")
             lin_speed = 0.0
-            if (current_time - self.t0 <= self.rotation_span):
-                rot_speed = -self.rot_max_speed
-            elif (current_time - self.t0 <= self.rotation_span + self.waiting_span):
-                rot_speed = 0.0
-            else:
-                self.t0 = time.time()
-                rot_speed = 0.0
-            lin_speed = 0.0
+            rot_speed = -self.rot_max_speed
+            #if (current_time - self.t0 <= self.rotation_span):
+            #    rot_speed = -self.rot_max_speed
+            #elif (current_time - self.t0 <= self.rotation_span + self.waiting_span):
+            #    rot_speed = 0.0
+            #else:
+            #    self.t0 = time.time()
+            #    rot_speed = 0.0
+            #lin_speed = 0.0
     
               
   

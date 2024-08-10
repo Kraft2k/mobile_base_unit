@@ -59,7 +59,7 @@ class FindMarkersClient(Node):
 
         # self.max_distance = 0.7
         self.markers_found: Dict[int: MarkerObject] = {}
-        self.markers_need_found = [1, 2]
+        self.markers_need_found = [2,1]
         self.is_on_order_find_markers = True
         self.number_of_the_marker_we_are_going_to = None
         self.detect_marker = False
@@ -68,9 +68,9 @@ class FindMarkersClient(Node):
         self.waiting_span = 0.3
         self.reached_distance = 0.95
         self.distance_to_marker = 0.0
-
+        
         self.lin_max_speed = 0.17
-        self.rot_max_speed = 0.03
+        self.rot_max_speed = 0.013
         self.t0 = time.time()
         #time.sleep(1)
 
@@ -155,9 +155,8 @@ class FindMarkersClient(Node):
             #print(f'Обновление основного потока движения')
 
     def _main_action(self):
-        lin_speed = self.lin_max_speed
-        rot_speed = self.rot_max_speed
-
+        lin_speed = 0.0
+        rot_speed = 0.1
      
         twist = Twist()
         twist.linear.x = lin_speed
@@ -167,15 +166,17 @@ class FindMarkersClient(Node):
         twist.angular.y = 0.0
         twist.angular.z = rot_speed
         self.publish(twist)
-
     def publish(self, twist:'Twist'):
         current_time = time.time()
-        
-        self.cmd_pub.publish(twist)
-        self.get_logger().info("lin_speed={:.2f}, rot_speed={:.2f}".format(
-            twist.linear.x, twist.angular.z ))
-        self.last_publish = current_time
-    
+        if self.last_publish < current_time - 0.4:
+            self.cmd_pub.publish(twist)
+            self.get_logger().info("lin_speed={:.2f}, rot_speed={:.2f}".format(
+                twist.linear.x, twist.angular.z ))
+            self.last_publish = current_time
+        else:
+            pass
+            #print('Waitinf ror thread')
+
     def _go_to_marker(self):
         _uni_marker_id = self.aruco_pose.marker_ids[0]
         if self.number_of_the_marker_we_are_going_to is not None and (_uni_marker_id != self.number_of_the_marker_we_are_going_to):
