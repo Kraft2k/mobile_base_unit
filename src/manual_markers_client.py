@@ -59,7 +59,7 @@ class FindMarkersClient(Node):
 
         # self.max_distance = 0.7
         self.markers_found: Dict[int: MarkerObject] = {}
-        self.markers_need_found = [1, 2]
+        self.markers_need_found = [1, 2, 3]
         self.is_on_order_find_markers = True
         self.number_of_the_marker_we_are_going_to = None
         self.detect_marker = False
@@ -138,7 +138,7 @@ class FindMarkersClient(Node):
         timer = threading.Timer(self.markers_found[_uni_marker_id].len_road_to_marker*1.5, _)
         timer.start()
 
-        self._go_back_from_marker()
+        #self._go_back_from_marker()
 
 
     def markers_callback(self, msg:'ArucoMarkers'):
@@ -156,18 +156,20 @@ class FindMarkersClient(Node):
             #print(f'Обновление основного потока движения')
 
     def _main_action(self):
-        lin_speed = self.lin_max_speed
-        rot_speed = self.rot_max_speed
+        # lin_speed = self.lin_max_speed
+        # rot_speed = self.rot_max_speed
 
      
         twist = Twist()
-        twist.linear.x = lin_speed
-        twist.linear.y = 0.0
-        twist.linear.z = 0.0
-        twist.angular.x = 0.0
-        twist.angular.y = 0.0
-        twist.angular.z = rot_speed
+        # twist.linear.x = lin_speed
+        # twist.linear.y = 0.0
+        # twist.linear.z = 0.0
+        # twist.angular.x = 0.0
+        # twist.angular.y = 0.0
+        # twist.angular.z = rot_speed
         self.publish(twist)
+
+        
 
     def publish(self, twist:'Twist'):
         current_time = time.time()
@@ -223,13 +225,13 @@ class FindMarkersClient(Node):
 
         
         twist = Twist()
-        twist.linear.x = 0.02    # stable 0.02
-        twist.linear.y = 0.0
-        twist.linear.z = 0.0
-        twist.angular.x = 0.0
-        twist.angular.y = 0.0
-        #twist.angular.z = -x/5          # stable  -x/5
-        twist.angular.z = 0.0
+        # twist.linear.x = 0.02    # stable 0.02
+        # twist.linear.y = 0.0
+        # twist.linear.z = 0.0
+        # twist.angular.x = 0.0
+        # twist.angular.y = 0.0
+        # #twist.angular.z = -x/5          # stable  -x/5
+        # twist.angular.z = 0.0
         self.cmd_pub.publish(twist)
         self._main_cycle()
         
