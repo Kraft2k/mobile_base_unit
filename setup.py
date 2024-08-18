@@ -44,6 +44,8 @@ setup(
             'speed_test = src.speed_test:main',
             'go = src.go:main',
             'manual_markers_client = src.manual_markers_client:main',
+            'route_controller = src.route_controller:main',
+
             
             
         ],

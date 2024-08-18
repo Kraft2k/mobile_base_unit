@@ -291,14 +291,14 @@ class MobileBaseUnit(Node):
             'cmd_vel',
             self.cmd_vel_callback,
             QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
-        self.cmd_vel_sub  # prevent unused variable warning... JESUS WHAT HAVE WE BECOME
+        self.cmd_vel_sub  # prevent unused variable warning... 
 
         self.scan_sub = self.create_subscription(
             LaserScan,
             '/scan',
             self.scan_filter_callback,
             QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
-        self.scan_sub  # prevent unused variable warning... JESUS WHAT HAVE WE BECOME
+        self.scan_sub  # prevent unused variable warning... 
         self.scan_pub = self.create_publisher(
             LaserScan, 'scan_filterd', 10)
 
@@ -306,6 +306,10 @@ class MobileBaseUnit(Node):
             Float32, 'left_wheel_rpm', 2)
         self.pub_right_wheel_rpm = self.create_publisher(
             Float32, 'right_wheel_rpm', 2)
+
+        # 18.08.24
+        self.pub_battery_voltage = self.create_publisher(
+            Float32, 'battery_voltage', 10)
 
         self.pub_odom = self.create_publisher(
             Odometry, 'odom', 2)
@@ -570,6 +574,9 @@ class MobileBaseUnit(Node):
         Checks that the battery voltages are safe and warns or stops the HAL accordingly.
         """
         t = time.time()
+        # 18.08.24
+        voltage_pub = Float32()
+
         if verbose:
             self.print_all_measurements()
         if (t - self.measurements_t) > (self.rover_base.battery_check_period+1):
@@ -580,6 +587,10 @@ class MobileBaseUnit(Node):
         min_voltage = self.rover_base.battery_nb_cells * \
             self.rover_base.battery_cell_min_voltage
         voltage = self.battery_voltage
+
+        # 18.08.24
+        voltage_pub.data = float(self.battery_voltage)
+        self.pub_battery_voltage.publish(voltage_pub)
 
         if (min_voltage < voltage < warn_voltage):
             self.get_logger().warning("Battery voltage LOW ({}V). Consider recharging. Warning threshold: {:.1f}V, "
