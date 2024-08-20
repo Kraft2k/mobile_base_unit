@@ -45,6 +45,7 @@ setup(
             'go = src.go:main',
             'manual_markers_client = src.manual_markers_client:main',
             'route_controller = src.route_controller:main',
+            'route_player = src.route_player:main',
 
             
             
