@@ -3,11 +3,12 @@ from glob import glob
 
 package_name = 'mobile_base_unit'
 source_package_name = 'src'
+ai_source_package_name = 'ai_source'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name,source_package_name],
+    packages=[package_name, source_package_name, ai_source_package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -43,10 +44,11 @@ setup(
             'up_front_servo_client = src.up_front_servo_client:main',
             'speed_test = src.speed_test:main',
             'go = src.go:main',
+            'go_to_marker = src.go_to_marker:main',
             'manual_markers_client = src.manual_markers_client:main',
             'route_controller = src.route_controller:main',
             'route_player = src.route_player:main',
-
+            'segnet_moving = ai_source.segnet_moving:main',
             
             
         ],

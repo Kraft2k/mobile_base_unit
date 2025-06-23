@@ -200,8 +200,8 @@ class FindMarkersClient(Node):
 
         if z > self.markers_found[_uni_marker_id].len_road_to_marker:
             self.markers_found[_uni_marker_id].len_road_to_marker = z
-        # print(f'Поворот -> {x}')
-        # print(f'Down -> {y}')
+        print(f'Offset -> {x}')
+        print(f'Height -> {y}')
         print(f'Distance -> {z}')
         
         x2 = self.aruco_pose.poses[0].orientation.x
@@ -211,7 +211,7 @@ class FindMarkersClient(Node):
         
         # print(f'orientation -> {x2},{y2},{z2},{w2}')
 
-        if z < 1.7:
+        if z < 0.9:
             self.number_of_the_marker_we_are_going_to = None
 
             print(f'New marker -> {_uni_marker_id}')
@@ -228,8 +228,8 @@ class FindMarkersClient(Node):
         twist.linear.z = 0.0
         twist.angular.x = 0.0
         twist.angular.y = 0.0
-        #twist.angular.z = -x/5          # stable  -x/5
-        twist.angular.z = 0.0
+        twist.angular.z = -x/5          # stable  -x/5
+        #twist.angular.z = 0.0
         self.cmd_pub.publish(twist)
         self._main_cycle()
         

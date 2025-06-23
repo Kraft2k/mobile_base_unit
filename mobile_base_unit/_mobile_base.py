@@ -112,7 +112,7 @@ class MobileBase:
         self.left_wheel_measurements, self.right_wheel_measurements = None, None
         self.left_wheel_nones, self.right_wheel_nones = 0, 0
         self.wheel_radius = 0.20/2.0
-        self.y_distance_wheels = 0.352
+        self.y_distance_wheels = 0.35
         self.wheel_to_center = self.y_distance_wheels/2.0
         self.half_poles = 3.5
         self.left_wheel_rpm, self.right_wheel_rpm = 0, 0
@@ -140,7 +140,6 @@ class MobileBase:
 
 
 class MobileBaseUnit(Node):
-
     
 
     def __init__(self) -> None:
@@ -149,17 +148,6 @@ class MobileBaseUnit(Node):
         Low level side: connecting with the hardware and making a first read of the sensors
         """
         super().__init__('mobile_base_unit')
-
-
-        # Параметры адаптивного торможения
-        self.BRAKE_RAMP_DOWN_STEPS = 5          # Шагов для плавного торможения
-        self.MIN_PWM_THRESHOLD = 0.01           # Порог отключения PWM
-        self.POSITION_TOLERANCE = 0.005          # 5 мм
-        self.ANGLE_TOLERANCE = math.radians(0.5) # 0.5°
-        self.SLOWDOWN_DISTANCE = 0.1             # 10 см - начало замедления
-        self.SLOWDOWN_ANGLE = math.radians(5)    # 5° - начало замедления
-
-
         self.get_logger().info("Starting Mobile base unit!")
         self.unit_model = 0.9
         try:
@@ -290,7 +278,7 @@ class MobileBaseUnit(Node):
                          max_i_contribution=0.0)
         self.y_pid = PID(p=2.0, i=0.00, d=0.0, max_command=0.5,
                          max_i_contribution=0.0)
-        self.theta_pid = PID(p=0.28, i=0.0015, d=0.20,
+        self.theta_pid = PID(p=0.28, i=0.0015, d=0.2,
                              max_command=0.20, max_i_contribution=0.03)
 
         self.max_wheel_speed = self.pwm_to_wheel_rot_speed(self.max_duty_cycle)
@@ -380,38 +368,6 @@ class MobileBaseUnit(Node):
         self.check_battery()
         self.create_timer(self.rover_base.battery_check_period,
                           self.check_battery)
-    
-    def _enable_brake_mode(self):
-        """Плавное торможение с использованием констант"""
-        current_pwm = max(
-            abs(self.rover_base.left_wheel_measurements.duty_cycle_now),
-            abs(self.rover_base.right_wheel_measurements.duty_cycle_now)
-        )
-        
-        # Плавное снижение PWM
-        for step in range(self.BRAKE_RAMP_DOWN_STEPS):
-            ratio = (self.BRAKE_RAMP_DOWN_STEPS - step) / self.BRAKE_RAMP_DOWN_STEPS
-            pwm = current_pwm * ratio
-            pwm = max(pwm, self.MIN_PWM_THRESHOLD)  # Не опускаться ниже порога
-            
-            self.rover_base.left_wheel.set_duty_cycle(pwm)
-            self.rover_base.right_wheel.set_duty_cycle(pwm)
-            time.sleep(0.01)
-        
-        # Финишное торможение
-        self.rover_base.left_wheel.set_duty_cycle(0)
-        self.rover_base.right_wheel.set_duty_cycle(0)
-        self.mode = UnitModes.BRAKE
-
-    def _check_position_error(self) -> bool:
-        """Проверка достижения цели с использованием констант"""
-        pos_error = math.sqrt((self.x_goal - self.x_odom)**2 + 
-                            (self.y_goal - self.y_odom)**2)
-        angle_error = abs(angle_diff(self.theta_goal, self.theta_odom))
-        
-        return (pos_error < self.POSITION_TOLERANCE and 
-                angle_error < self.ANGLE_TOLERANCE)
-
 
     def parameters_callback(self, params) -> None:
         """When a ROS parameter is changed, this method will be called to verify the change and accept/deny it.
@@ -1099,40 +1055,19 @@ class MobileBaseUnit(Node):
         """Calculates the speed targets to be sent on x, y and theta to reach their respective goals during a GoTo
         This function uses 3 separate PIDs controllers.
         """
-        # x_command_odom = self.x_pid.tick(self.x_odom)
-        # y_command_odom = self.y_pid.tick(self.y_odom)
-        # theta_command_odom = self.theta_pid.tick(
-        #     self.theta_odom, is_angle=True)
+        x_command_odom = self.x_pid.tick(self.x_odom)
+        y_command_odom = self.y_pid.tick(self.y_odom)
+        theta_command_odom = self.theta_pid.tick(
+            self.theta_odom, is_angle=True)
 
-        # x_command = x_command_odom * \
-        #     math.cos(-self.theta_odom) - y_command_odom * \
-        #     math.sin(-self.theta_odom)
-        # y_command = x_command_odom * \
-        #     math.sin(-self.theta_odom) + y_command_odom * \
-        #     math.cos(-self.theta_odom)
+        x_command = x_command_odom * \
+            math.cos(-self.theta_odom) - y_command_odom * \
+            math.sin(-self.theta_odom)
+        y_command = x_command_odom * \
+            math.sin(-self.theta_odom) + y_command_odom * \
+            math.cos(-self.theta_odom)
 
-        # return x_command, y_command, theta_command_odom
-
-        if self._check_position_error():
-            self._enable_brake_mode()
-            return 0.0, 0.0, 0.0
-    
-        # Адаптивное управление
-        error = math.sqrt((self.x_goal - self.x_odom)**2 + (self.y_goal - self.y_odom)**2)
-        angle_error = abs(angle_diff(self.theta_goal, self.theta_odom))
-        self.get_logger().info(f"Angle error: {math.degrees(angle_error):.2f}°")  # Логируем ошибку в градусах
-
-        # Плавное снижение мощности у цели
-        if error < 0.1 or angle_error < math.radians(5):
-            self.theta_pid.max_command = 0.15
-            self.x_pid.max_command = 0.1
-            self.y_pid.max_command = 0.1
-        else:
-            self.theta_pid.max_command = 0.3
-            self.x_pid.max_command = 0.3    
-            self.y_pid.max_command = 0.3
-
-        return self.x_pid.tick(self.x_odom), self.y_pid.tick(self.y_odom), self.theta_pid.tick(self.theta_odom, is_angle=True)
+        return x_command, y_command, theta_command_odom
 
     def stop_ongoing_services(self) -> None:
         """Stops the GoTo and the SetSpeed services, if they were running"""
@@ -1190,24 +1125,16 @@ class MobileBaseUnit(Node):
                 self.x_vel_goal_filtered, self.y_vel_goal_filtered, self.theta_vel_goal_filtered)
             self.send_wheel_commands(wheel_speeds)
         elif self.mode is UnitModes.GOTO:
-
             x_vel, y_vel, theta_vel = 0, 0, 0
-            # if self.goto_service_on:
-            #     distance = math.sqrt(
-            #         (self.x_goal - self.x_odom)**2 +
-            #         (self.y_goal - self.y_odom)**2
-            #     )
-            #     if distance < self.xy_tol and abs(angle_diff(self.theta_goal, self.theta_odom)) < self.theta_tol:
-            #         self.goto_service_on = False
-            #     else:
-            #         x_vel, y_vel, theta_vel = self.position_control()
-
-            if not self.goto_service_on:
-                self._enable_brake_mode()  # Гарантированное торможение при отмене
-            else:
-                x_vel, y_vel, theta_vel = self.position_control()
-                wheel_speeds = self.ik_vel(x_vel, y_vel, theta_vel)
-                self.send_wheel_commands(wheel_speeds)
+            if self.goto_service_on:
+                distance = math.sqrt(
+                    (self.x_goal - self.x_odom)**2 +
+                    (self.y_goal - self.y_odom)**2
+                )
+                if distance < self.xy_tol and abs(angle_diff(self.theta_goal, self.theta_odom)) < self.theta_tol:
+                    self.goto_service_on = False
+                else:
+                    x_vel, y_vel, theta_vel = self.position_control()
 
             x_vel, y_vel, theta_vel = self.lidar_safety.safety_check_speed_command(
                 x_vel, y_vel, theta_vel)
