@@ -511,8 +511,12 @@ class MobileBaseUnit(Node):
                               ) -> ResetOdometry.Response:
         """Handle ResetOdometry service request"""
         # Resetting asynchronously to prevent race conditions.
-        self.reset_odom = True
         self.get_logger().info("Requested to reset the odometry frame")
+
+        self.read_measurements()  # Принудительно читаем новые данные
+        self.update_wheel_speeds()  # Обновляем rpm
+        time.sleep(0.05)  # Небольшая задержка для стабилизации
+        self.reset_odom = True
         response.success = True
         return response
 
@@ -993,6 +997,20 @@ class MobileBaseUnit(Node):
 
         # Local speeds in egocentric frame.
         # "rpm" are actually erpm and need to be divided by half the amount of magnetic poles to get the actual rpm.
+        
+        if self.reset_odom:
+            self.reset_odom = False
+            self.x_odom = 0.0
+            self.y_odom = 0.0
+            self.theta_odom = 0.0
+            self.x_vel = 0.0
+            self.y_vel = 0.0
+            self.theta_vel = 0.0
+            self.rover_base.left_wheel_rpm_deque.clear()
+            self.rover_base.right_wheel_rpm_deque.clear()
+            if self.goto_service_on:
+                self.goto_service_on = False
+            return  # Пропустить этот тик
         self.x_vel, self.y_vel, self.theta_vel = self.dk_vel(self.rover_base.left_wheel_rpm/self.rover_base.half_poles,
                                                             self.rover_base.right_wheel_rpm/self.rover_base.half_poles)
         # self.get_logger().info(
@@ -1012,17 +1030,7 @@ class MobileBaseUnit(Node):
         self.vx = dx / dt_seconds
         self.vy = dy / dt_seconds
         self.vtheta = dtheta / dt_seconds
-        if self.reset_odom:
-            # Resetting asynchronously to prevent race conditions.
-            # dx, dy and dteta remain correct even on the reset tick
-            self.reset_odom = False
-            self.x_odom = 0.0
-            self.y_odom = 0.0
-            self.theta_odom = 0.0
 
-            # Resetting the odometry while a GoTo is ON might be dangerous. Stopping it to make sure:
-            if self.goto_service_on:
-                self.goto_service_on = False
         self.publish_odometry_and_tf()
 
     def limit_duty_cycles(self, duty_cycles: List[float]) -> List[float]:
