@@ -382,23 +382,10 @@ class MobileBaseUnit(Node):
                           self.check_battery)
     
     def _enable_brake_mode(self):
-        """Плавное торможение с использованием констант"""
-        current_pwm = max(
-            abs(self.rover_base.left_wheel_measurements.duty_cycle_now),
-            abs(self.rover_base.right_wheel_measurements.duty_cycle_now)
-        )
-        
-        # Плавное снижение PWM
-        for step in range(self.BRAKE_RAMP_DOWN_STEPS):
-            ratio = (self.BRAKE_RAMP_DOWN_STEPS - step) / self.BRAKE_RAMP_DOWN_STEPS
-            pwm = current_pwm * ratio
-            pwm = max(pwm, self.MIN_PWM_THRESHOLD)  # Не опускаться ниже порога
-            
-            self.rover_base.left_wheel.set_duty_cycle(pwm)
-            self.rover_base.right_wheel.set_duty_cycle(pwm)
-            time.sleep(0.01)
-        
-        # Финишное торможение
+        """Переключает режим в BRAKE и обнуляет PWM.
+        Не использует time.sleep — плавное торможение обеспечивается
+        самим VESC-контроллером и последующими тиками BRAKE-режима в main_tick.
+        """
         self.rover_base.left_wheel.set_duty_cycle(0)
         self.rover_base.right_wheel.set_duty_cycle(0)
         self.mode = UnitModes.BRAKE
