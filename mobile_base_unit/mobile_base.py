@@ -564,7 +564,7 @@ class MobileBaseUnit(Node):
                                  ) -> IsGoToFinished.Response:
         """Handle IsGoToFinished service request"""
         # Returns True if the goal position is reached
-        response.success = self.goto_service_on
+        response.success = not self.goto_service_on
         return response
 
     def handle_distance_to_goal(self, request: DistanceToGoal.Request, response: DistanceToGoal.Response
