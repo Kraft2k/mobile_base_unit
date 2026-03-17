@@ -1054,8 +1054,6 @@ class MobileBaseUnit(Node):
     def read_measurements(self) -> None:
         """Calls the low level functions to read the measurements on the 3 wheel controllers
         """
-        self.nb_full_com_fails = 0
-        self.max_full_com_fails = 100
         self.rover_base.read_all_measurements()
         #if self.rover_base.back_wheel_measurements is not None:
         #   self.battery_voltage = self.rover_base.back_wheel_measurements.v_in
