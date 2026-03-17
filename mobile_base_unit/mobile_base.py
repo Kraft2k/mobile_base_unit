@@ -799,18 +799,15 @@ class MobileBaseUnit(Node):
             rot_r (float): rpm speed of the right wheel
 
         """
-        # rpm to rad/s then m/s
-    
-        speed_l = (2*math.pi*rot_l/60)*self.rover_base.wheel_radius
-        speed_r = (2*math.pi*rot_r/60)*self.rover_base.wheel_radius
-        
-        """   
-        speed_l = math.radians(rot_l/60)
-        speed_r = math.radians(rot_r/60)
-        """
-        x_vel = (self.rover_base.wheel_radius * (speed_r + speed_l)) / 2
+        # rpm -> rad/s -> m/s
+        speed_l = (2*math.pi*rot_l/60) * self.rover_base.wheel_radius
+        speed_r = (2*math.pi*rot_r/60) * self.rover_base.wheel_radius
+
+        # Standard differential drive forward kinematics:
+        # v = (v_r + v_l) / 2,  omega = (v_r - v_l) / L
+        x_vel = (speed_r + speed_l) / 2
         y_vel = 0.0
-        theta_vel = (self.rover_base.wheel_radius * (speed_r - speed_l)) / self.rover_base.y_distance_wheels
+        theta_vel = (speed_r - speed_l) / self.rover_base.y_distance_wheels
 
         return [x_vel, y_vel, theta_vel]
 
