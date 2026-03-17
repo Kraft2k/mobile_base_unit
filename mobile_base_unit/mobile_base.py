@@ -1111,15 +1111,16 @@ class MobileBaseUnit(Node):
 
         # Плавное снижение мощности у цели
         if error < 0.1 or angle_error < math.radians(5):
-            self.theta_pid.max_command = 0.15
-            self.x_pid.max_command = 0.1
-            self.y_pid.max_command = 0.1
+            max_xy = 0.1
+            max_theta = 0.15
         else:
-            self.theta_pid.max_command = 0.3
-            self.x_pid.max_command = 0.3    
-            self.y_pid.max_command = 0.3
+            max_xy = 0.3
+            max_theta = 0.3
 
-        return self.x_pid.tick(self.x_odom), self.y_pid.tick(self.y_odom), self.theta_pid.tick(self.theta_odom, is_angle=True)
+        x_vel = self.x_pid.limit(self.x_pid.tick(self.x_odom), max_xy)
+        y_vel = self.y_pid.limit(self.y_pid.tick(self.y_odom), max_xy)
+        theta_vel = self.theta_pid.limit(self.theta_pid.tick(self.theta_odom, is_angle=True), max_theta)
+        return x_vel, y_vel, theta_vel
 
     def stop_ongoing_services(self) -> None:
         """Stops the GoTo and the SetSpeed services, if they were running"""
