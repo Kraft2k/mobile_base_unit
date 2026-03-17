@@ -1208,17 +1208,13 @@ class MobileBaseUnit(Node):
             #         x_vel, y_vel, theta_vel = self.position_control()
 
             if not self.goto_service_on:
-                self._enable_brake_mode()  # Гарантированное торможение при отмене
+                self._enable_brake_mode()
             else:
                 x_vel, y_vel, theta_vel = self.position_control()
+                x_vel, y_vel, theta_vel = self.lidar_safety.safety_check_speed_command(
+                    x_vel, y_vel, theta_vel)
                 wheel_speeds = self.ik_vel(x_vel, y_vel, theta_vel)
                 self.send_wheel_commands(wheel_speeds)
-
-            x_vel, y_vel, theta_vel = self.lidar_safety.safety_check_speed_command(
-                x_vel, y_vel, theta_vel)
-            wheel_speeds = self.ik_vel(
-                x_vel, y_vel, theta_vel)
-            self.send_wheel_commands(wheel_speeds)
 
         elif self.mode is UnitModes.EMERGENCY_STOP:
             msg = "Emergency stop requested"
