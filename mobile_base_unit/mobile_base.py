@@ -505,7 +505,6 @@ class MobileBaseUnit(Node):
 
         self.read_measurements()  # Принудительно читаем новые данные
         self.update_wheel_speeds()  # Обновляем rpm
-        time.sleep(0.05)  # Небольшая задержка для стабилизации
         self.reset_odom = True
         response.success = True
         return response
