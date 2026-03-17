@@ -453,10 +453,12 @@ class MobileBaseUnit(Node):
                 elif param.name == "safety_distance":
                     if param.value >= 0.0:
                         self.safety_distance = param.value
+                        self.lidar_safety.safety_distance = param.value
                         success = True
                 elif param.name == "critical_distance":
                     if param.value >= 0.0:
                         self.critical_distance = param.value
+                        self.lidar_safety.critical_distance = param.value
                         success = True
 
             elif param.type_ is Parameter.Type.STRING:
