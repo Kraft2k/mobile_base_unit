@@ -846,23 +846,19 @@ class MobileBaseUnit(Node):
         return to_print
 
     def print_all_measurements(self) -> None:
-        """Prints the low level measurements from the 3 wheel controllers
+        """Prints the low level measurements from the 2 wheel controllers
         """
-        to_print = "\n*** back_wheel measurements:\n"
-        to_print += self.format_measurements(
-            self.rover_base.back_wheel_measurements)
-        to_print += "\n\n*** left_wheel:\n"
+        to_print = "\n*** left_wheel:\n"
         to_print += self.format_measurements(
             self.rover_base.left_wheel_measurements)
         to_print += "\n\n*** right_wheel:\n"
         to_print += self.format_measurements(
             self.rover_base.right_wheel_measurements)
-        to_print += "\n\n Fails ('Nones') left:{}, right:{}, back:{}".format(
-            self.rover_base.left_wheel_nones, self.rover_base.right_wheel_nones, self.rover_base.back_wheel_nones)
-        to_print += "\n\n AVG RPM left:{:.2f}, right:{:.2f}, back:{:.2f}".format(
+        to_print += "\n\n Fails ('Nones') left:{}, right:{}".format(
+            self.rover_base.left_wheel_nones, self.rover_base.right_wheel_nones)
+        to_print += "\n\n AVG RPM left:{:.2f}, right:{:.2f}".format(
             self.rover_base.left_wheel_avg_rpm/self.rover_base.half_poles,
-            self.rover_base.right_wheel_avg_rpm/self.rover_base.half_poles,
-            self.rover_base.back_wheel_avg_rpm/self.rover_base.half_poles)
+            self.rover_base.right_wheel_avg_rpm/self.rover_base.half_poles)
 
         self.get_logger().info("{}".format(to_print))
         # 20 tours en 35s, avg_rpm ~=34
