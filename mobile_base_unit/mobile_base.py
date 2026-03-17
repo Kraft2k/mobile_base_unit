@@ -886,10 +886,6 @@ class MobileBaseUnit(Node):
         """
         # Keeping a local value of the wheel speeds to handle None measurements (we'll use the last valid measure)
 
-        self.rover_base.right_wheel_nones = 0
-        self.rover_base.left_wheel_nones = 0
-        
-
         #if self.rover_base.back_wheel_measurements is not None:
         #    value = float(
         #       self.rover_base.back_wheel_measurements.rpm)
@@ -901,6 +897,7 @@ class MobileBaseUnit(Node):
         #    self.rover_base.back_wheel_nones += 1
 
         if self.rover_base.left_wheel_measurements is not None:
+            self.rover_base.left_wheel_nones = 0
             value = float(
                 self.rover_base.left_wheel_measurements.rpm)
             self.rover_base.left_wheel_rpm = value
@@ -911,6 +908,7 @@ class MobileBaseUnit(Node):
             self.rover_base.left_wheel_nones += 1
 
         if self.rover_base.right_wheel_measurements is not None:
+            self.rover_base.right_wheel_nones = 0
             value = float(
                 self.rover_base.right_wheel_measurements.rpm)
             self.rover_base.right_wheel_rpm = value
