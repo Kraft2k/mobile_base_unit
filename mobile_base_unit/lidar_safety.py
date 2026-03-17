@@ -1,7 +1,4 @@
-import os
 import math
-import traceback
-from subprocess import check_output
 from typing import List
 
 
@@ -12,7 +9,7 @@ from mobile_base_unit.utils import angle_diff
 
 class LidarSafety:
     def __init__(self, safety_distance: float, critical_distance: float, robot_collision_radius: float,
-                 speed_reduction_factor: float, logger) -> None:
+                 speed_reduction_factor: float, x_offset: float, logger) -> None:
         """Utility class to reduce Units's speed when the mobile base is too close to obstacles seen by the LIDAR.
         Functional behaviour:
         - safety_distance >= critical_distance
@@ -32,20 +29,9 @@ class LidarSafety:
         self.critical_angles = []
         self.at_least_one_critical = False
         self.logger = logger
-        unit_model = 0.9
         # Not using the TF transforms because this is faster
         # TODO use a static TF2 transform instead
-        try:
-            float_model = float(unit_model)
-            if float_model < 1.0:
-                self.x_offset = 0.155
-            else:
-                self.x_offset = 0.1815
-        except Exception:
-            msg = "Unit version can't be processed, check that the 'unit_model' "
-            self.logger.error(msg)
-            self.logger.error(traceback.format_exc())
-            raise RuntimeError(msg)
+        self.x_offset = x_offset
 
     def clear_measures(self) -> None:
         """Clears all previous measures"""

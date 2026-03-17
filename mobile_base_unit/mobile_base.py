@@ -282,9 +282,10 @@ class MobileBaseUnit(Node):
 
         self.scan_is_read = False
         self.scan_timeout = 0.5
+        lidar_x_offset = 0.155 if self.unit_model < 1.0 else 0.1815
         self.lidar_safety = LidarSafety(
             self.safety_distance, self.critical_distance, robot_collision_radius=0.6,
-            speed_reduction_factor=0.88, logger=self.get_logger())
+            speed_reduction_factor=0.88, x_offset=lidar_x_offset, logger=self.get_logger())
 
         self.x_pid = PID(p=0.5, i=0.00, d=0.0, max_command=0.5,
                          max_i_contribution=0.0)
