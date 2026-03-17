@@ -105,6 +105,9 @@ class MobileBase:
             {'can_id': left_wheel_id, 'has_sensor': True, 'start_heartbeat': True},
             {'can_id': right_wheel_id, 'has_sensor': True, 'start_heartbeat': True},
         ]
+        """Initialises the serial connection to the two VESC motor controllers and sets up all
+        wheel state variables (RPM, deque buffers, geometry constants, battery thresholds).
+        """
         self._multi_vesc = MultiVESC(
             serial_port=serial_port, vescs_params=params)
 
@@ -511,6 +514,7 @@ class MobileBaseUnit(Node):
 
     def handle_get_odometry(self, request: GetOdometry.Request, response: GetOdometry.Response
                             ) -> GetOdometry.Response:
+        """Handle GetOdometry service request. Returns the current odometric pose (x, y, theta)."""
         response.x = self.x_odom
         response.y = self.y_odom
         response.theta = self.theta_odom
@@ -585,9 +589,7 @@ class MobileBaseUnit(Node):
     """
     def handle_set_front_lights(self, request: SetFrontLights.Request, response: SetFrontLights.Response
                                ) -> SetFrontLights.Response:
-    
-
-
+        """Handle SetFrontLights service request. Turns the front GPIO lights on or off."""
         front_lights_on = request.front_lights_on
         
         if front_lights_on: 
